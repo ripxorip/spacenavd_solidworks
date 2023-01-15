@@ -1,0 +1,1 @@
+# spacenavd_solidworks
