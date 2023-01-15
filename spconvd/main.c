@@ -70,10 +70,12 @@ void daem_close(int fd)
 
 int main(void)
 {
+	/*
 	if (daemon(0, 1)) {
 		DPRN("could not daemonize\n");
 		return -1;
 	}
+	*/
 
 	int listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (listenfd < 0) {
@@ -86,7 +88,7 @@ int main(void)
 
 	struct sockaddr_in addr_in = {0};
 	addr_in.sin_family = AF_INET;
-	addr_in.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr_in.sin_port = htons(PORT);
 
 	if (bind(listenfd, (struct sockaddr*)&addr_in, sizeof(addr_in))) {
