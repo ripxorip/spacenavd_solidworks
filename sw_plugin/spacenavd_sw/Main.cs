@@ -109,7 +109,7 @@ namespace SpacenavdSw
 
         void poll_thread()
         {
-            var server = "192.168.1.52";
+            var server = "10.0.0.230";
             Int32 port = 11111;
             using (TcpClient client = new TcpClient(server, port))
             {
@@ -135,6 +135,10 @@ namespace SpacenavdSw
                     ModelViewManager swModelViewManager = default(ModelViewManager);
                     ModelView swModelView = default(ModelView);
                     swModel = (ModelDoc2)m_App.ActiveDoc;
+                    if (swModel == null)
+                    {
+                        Debug.WriteLine("Oops...\n");
+                    }
 
                     swModelView = (ModelView)swModel.ActiveView;
                     swModelView.TranslateBy(20e-6 * res_array[1], 20e-6 * res_array[2]);
