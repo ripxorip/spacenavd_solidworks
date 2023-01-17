@@ -96,12 +96,24 @@ namespace SpacenavdSw
         private ISldWorks m_App;
         private Thread t1;
 
+        void test()
+        {
+            ModelDoc2 swModel = default(ModelDoc2);
+            ModelViewManager swModelViewManager = default(ModelViewManager);
+            ModelView swModelView = default(ModelView);
+            swModel = (ModelDoc2)m_App.ActiveDoc;
+
+            swModelView = (ModelView)swModel.ActiveView;
+            swModelView.TranslateBy(-0.0005535897435897, 0);
+        }
+
         void poll_thread()
         {
             var server = "192.168.1.52";
             Int32 port = 11111;
             using (TcpClient client = new TcpClient(server, port))
             {
+
                 NetworkStream stream = client.GetStream();
                 while (true)
                 {
@@ -116,9 +128,16 @@ namespace SpacenavdSw
 
                     for (int i = 0; i < 32 / 4; i++)
                     {
-                        Console.WriteLine(res_array[i]);
+                        Debug.WriteLine(res_array[i]);
                     }
-                    Console.WriteLine("*****");
+                    Debug.WriteLine("*****");
+                    ModelDoc2 swModel = default(ModelDoc2);
+                    ModelViewManager swModelViewManager = default(ModelViewManager);
+                    ModelView swModelView = default(ModelView);
+                    swModel = (ModelDoc2)m_App.ActiveDoc;
+
+                    swModelView = (ModelView)swModel.ActiveView;
+                    swModelView.TranslateBy(20e-6 * res_array[1], 20e-6 * res_array[2]);
                 }
             }
         }
@@ -127,7 +146,7 @@ namespace SpacenavdSw
         {
             m_App = ThisSW as ISldWorks;
 
-            m_App.SendMsgToUser("Hello from the spacenavd_sw plugin");
+            Debug.WriteLine("Hello from the spacenavd_sw plugin");
             t1 = new Thread(poll_thread);
             t1.Start();
 
