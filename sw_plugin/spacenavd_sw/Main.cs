@@ -4,7 +4,9 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace SpacenavdSw
 {
@@ -92,12 +94,42 @@ namespace SpacenavdSw
         #endregion
 
         private ISldWorks m_App;
+        private Thread t1;
+
+        void poll_thread()
+        {
+            var server = "192.168.1.52";
+            Int32 port = 11111;
+            using (TcpClient client = new TcpClient(server, port))
+            {
+                NetworkStream stream = client.GetStream();
+                while (true)
+                {
+                    var data = new Byte[256];
+                    var res = stream.Read(data, 0, 32);
+                    var res_array = new Int32[32 / 4];
+                    for (int i = 0; i < 32 / 4; i++)
+                    {
+                        int num = BitConverter.ToInt32(data, i * 4);
+                        res_array[i] = num;
+                    }
+
+                    for (int i = 0; i < 32 / 4; i++)
+                    {
+                        Console.WriteLine(res_array[i]);
+                    }
+                    Console.WriteLine("*****");
+                }
+            }
+        }
 
         public bool ConnectToSW(object ThisSW, int Cookie)
         {
             m_App = ThisSW as ISldWorks;
 
             m_App.SendMsgToUser("Hello from the spacenavd_sw plugin");
+            t1 = new Thread(poll_thread);
+            t1.Start();
 
             return true;
         }
