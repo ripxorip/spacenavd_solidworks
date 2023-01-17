@@ -1,2 +1,5 @@
 spconvd/spconvd
 spconvd/tags
+sw_plugin/spacenavd_sw/bin
+sw_plugin/spacenavd_sw/obj
+sw_plugin/spacenavd_sw/.vs
