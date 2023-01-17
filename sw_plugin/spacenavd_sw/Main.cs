@@ -13,7 +13,7 @@ namespace SpacenavdSw
     [ComVisible(true)]
     [Guid("31B803E0-7A01-4841-A0DE-895B726625C9")]
     [DisplayName("Spacenavd SW")]
-    [Description("Spacenavd solivworks plugin")]
+    [Description("Spacenavd solidworks plugin")]
     public class SpacenavdSw : ISwAddin
     {
         #region Registration
