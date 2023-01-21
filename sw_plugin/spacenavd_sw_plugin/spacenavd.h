@@ -134,8 +134,7 @@ public:
 				IModelView* m_view = CComQIPtr<IModelView, &__uuidof(IModelView)>(aw_ptr);
 				if (m_view != NULL) {
 					m_view->TranslateBy(x * move_coef, y * move_coef);
-					//m_view->ZoomByFactor(z * zoom_coef);
-					//m_view->RotateAboutCenter(10, 10);
+					m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
 				}
 			}
 		}
