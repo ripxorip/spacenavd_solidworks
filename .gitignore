@@ -3,3 +3,5 @@ spconvd/tags
 sw_plugin/spacenavd_sw/bin
 sw_plugin/spacenavd_sw/obj
 sw_plugin/spacenavd_sw/.vs
+sw_plugin/spacenavd_sw_plugin/x64
+sw_plugin/spacenavd_sw_plugin/.vs

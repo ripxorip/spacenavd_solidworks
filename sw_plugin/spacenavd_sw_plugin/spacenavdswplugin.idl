@@ -1,0 +1,36 @@
+// spacenavd_sw_plugin.idl : IDL source for spacenavd_sw_plugin
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (spacenavdswplugin.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(5a493e42-a26a-4140-a387-d82a54340a3b),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface Ispacenavd : IDispatch
+{
+};
+[
+	uuid(ddcfa78a-bcca-493c-b920-9ca1d5203fa6),
+	version(1.0),
+]
+library spacenavdswpluginLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(576c39a5-6698-4436-abf2-5e2bc1ca8506)
+	]
+	coclass spacenavd
+	{
+		[default] interface Ispacenavd;
+	};
+};
+
+import "shobjidl.idl";

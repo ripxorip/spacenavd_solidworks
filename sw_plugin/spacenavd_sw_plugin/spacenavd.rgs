@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {576c39a5-6698-4436-abf2-5e2bc1ca8506} = s 'spacenavd class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{ddcfa78a-bcca-493c-b920-9ca1d5203fa6}'
+			Version = s '1.0'
+		}
+	}
+}
