@@ -66,6 +66,7 @@ public:
 	STDMETHOD(ConnectToSW)(LPDISPATCH ThisSW, long Cookie, VARIANT_BOOL * IsConnected)
 	{
 		/* Marshall to the background thread */
+		/* Cred: https://www.codeproject.com/Articles/9506/Understanding-The-COM-Single-Threaded-Apartment-2 */
 		IUnknown* pIUnknown = NULL;
 		pIStream = NULL;
 		ThisSW->QueryInterface(IID_IUnknown, (void**)&pIUnknown);
@@ -87,6 +88,7 @@ public:
 
 	void run_thread() {
 		/* Mashall to this thread */
+		/* Cred: https://www.codeproject.com/Articles/9506/Understanding-The-COM-Single-Threaded-Apartment-2 */
 		CComPtr<ISldWorks> sw = NULL;
 		::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		::CoGetInterfaceAndReleaseStream(pIStream, __uuidof(ISldWorks), (void**)&sw);
