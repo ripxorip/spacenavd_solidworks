@@ -113,6 +113,19 @@ public:
 			int ret = recv(s, (char*)buf, 256, 0); // Shall be 32
 			mouse_data = (int32_t*)buf;
 
+			double x = mouse_data[1];
+			double y = mouse_data[2];
+			double z = mouse_data[3];
+			double rx = mouse_data[4];
+			double ry = mouse_data[5];
+			double rz = mouse_data[6];
+
+			double move_coef = 0.0002;
+			double rot_coef = 0.00015;
+			double tilt_coef = 0.0007;
+			double zoom_coef = 0.0005;
+
+
 			CComPtr<IModelDoc2> iModelDoc2;
 			sw->IGetFirstDocument2(&iModelDoc2);
 			if (iModelDoc2 != NULL) {
@@ -120,7 +133,8 @@ public:
 				HRESULT res = iModelDoc2->GetFirstModelView(&aw_ptr);
 				IModelView* m_view = CComQIPtr<IModelView, &__uuidof(IModelView)>(aw_ptr);
 				if (m_view != NULL) {
-					m_view->TranslateBy(20e-6 * mouse_data[1], 20e-6 * mouse_data[2]);
+					m_view->TranslateBy(x * move_coef, y * move_coef);
+					//m_view->ZoomByFactor(z * zoom_coef);
 					//m_view->RotateAboutCenter(10, 10);
 				}
 			}
