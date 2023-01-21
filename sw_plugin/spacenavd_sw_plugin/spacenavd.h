@@ -14,6 +14,8 @@
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
 
+#pragma comment(lib,"ws2_32.lib") //Winsock Library
+
 using namespace ATL;
 using namespace std;
 
@@ -93,7 +95,24 @@ public:
 		::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		::CoGetInterfaceAndReleaseStream(pIStream, __uuidof(ISldWorks), (void**)&sw);
 
+		/* Socket */
+#pragma warning(disable:4996) 
+		WSADATA wsa;
+		SOCKET s;
+		struct sockaddr_in server;
+		WSAStartup(MAKEWORD(2, 2), &wsa);
+		s = socket(AF_INET, SOCK_STREAM, 0);
+		server.sin_addr.s_addr = inet_addr("10.0.0.230");
+		server.sin_family = AF_INET;
+		server.sin_port = htons(11111);
+		connect(s, (struct sockaddr*)&server, sizeof(server));
+		uint8_t buf[256];
+		int32_t *mouse_data;
+
 		while (true) {
+			int ret = recv(s, (char*)buf, 256, 0); // Shall be 32
+			mouse_data = (int32_t*)buf;
+
 			CComPtr<IModelDoc2> iModelDoc2;
 			sw->IGetFirstDocument2(&iModelDoc2);
 			if (iModelDoc2 != NULL) {
@@ -101,11 +120,10 @@ public:
 				HRESULT res = iModelDoc2->GetFirstModelView(&aw_ptr);
 				IModelView* m_view = CComQIPtr<IModelView, &__uuidof(IModelView)>(aw_ptr);
 				if (m_view != NULL) {
-					m_view->TranslateBy(0.002, 0.00);
-					m_view->RotateAboutCenter(10, 10);
+					m_view->TranslateBy(20e-6 * mouse_data[1], 20e-6 * mouse_data[2]);
+					//m_view->RotateAboutCenter(10, 10);
 				}
 			}
-			Sleep(500);
 		}
 	}
 
