@@ -126,23 +126,36 @@ public:
 			double ry = mouse_data[5];
 			double rz = mouse_data[6];
 
-			double move_coef = 0.00002;
-			double rot_coef = 0.00015;
-			double tilt_coef = 0.0007;
+			double move_coef = 0.00004;
+			double rot_coef = 0.00030;
+			double tilt_coef = 0.0014;
 			double zoom_coef = 0.000000005;
 
-			int thresh = 20;
+			int thresh = 30;
 
 			if (iModelDoc2 != NULL) {
 				if (m_view != NULL) {
 					/* Something like this?? */
 					//m_view->put_EnableGraphicsUpdate(false);
+					/* add some space in time in between? No, shall use translation3/orientation3!? */
 					if (abs(x) > thresh || abs(y) > thresh)
+					{
 						m_view->TranslateBy(x * move_coef, y * move_coef);
+						m_view->TranslateBy(x * move_coef, y * move_coef);
+						m_view->TranslateBy(x * move_coef, y * move_coef);
+					}
 					if (abs(rx) > thresh || abs(ry) > thresh)
+					{
 						m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
+						m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
+						m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
+					}
 					if (abs(rz) > thresh)
+					{
 						m_view->RollBy(-rz * rot_coef);
+						m_view->RollBy(-rz * rot_coef);
+						m_view->RollBy(-rz * rot_coef);
+					}
 					//m_view->put_EnableGraphicsUpdate(true);
 				}
 			}
