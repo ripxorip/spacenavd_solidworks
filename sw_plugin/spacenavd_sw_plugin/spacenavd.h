@@ -109,6 +109,12 @@ public:
 		uint8_t buf[256];
 		int32_t *mouse_data;
 
+		CComPtr<IModelDoc2> iModelDoc2;
+		sw->IGetFirstDocument2(&iModelDoc2);
+		LPDISPATCH aw_ptr;
+		HRESULT res = iModelDoc2->GetFirstModelView(&aw_ptr);
+		IModelView* m_view = CComQIPtr<IModelView, &__uuidof(IModelView)>(aw_ptr);
+
 		while (true) {
 			int ret = recv(s, (char*)buf, 256, 0); // Shall be 32
 			mouse_data = (int32_t*)buf;
@@ -120,21 +126,21 @@ public:
 			double ry = mouse_data[5];
 			double rz = mouse_data[6];
 
-			double move_coef = 0.0002;
+			double move_coef = 0.00002;
 			double rot_coef = 0.00015;
 			double tilt_coef = 0.0007;
-			double zoom_coef = 0.0005;
+			double zoom_coef = 0.000000005;
 
+			int thresh = 50;
 
-			CComPtr<IModelDoc2> iModelDoc2;
-			sw->IGetFirstDocument2(&iModelDoc2);
 			if (iModelDoc2 != NULL) {
-				LPDISPATCH aw_ptr;
-				HRESULT res = iModelDoc2->GetFirstModelView(&aw_ptr);
-				IModelView* m_view = CComQIPtr<IModelView, &__uuidof(IModelView)>(aw_ptr);
 				if (m_view != NULL) {
-					m_view->TranslateBy(x * move_coef, y * move_coef);
-					m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
+					if (abs(x) > thresh || abs(y) > thresh)
+						m_view->TranslateBy(x * move_coef, y * move_coef);
+					if (abs(rx) > thresh || abs(ry) > thresh)
+						m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
+					if (abs(rz) > thresh)
+						m_view->RollBy(-rz * rot_coef);
 				}
 			}
 		}
