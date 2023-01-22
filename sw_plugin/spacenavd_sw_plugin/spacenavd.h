@@ -131,16 +131,19 @@ public:
 			double tilt_coef = 0.0007;
 			double zoom_coef = 0.000000005;
 
-			int thresh = 50;
+			int thresh = 20;
 
 			if (iModelDoc2 != NULL) {
 				if (m_view != NULL) {
+					/* Something like this?? */
+					//m_view->put_EnableGraphicsUpdate(false);
 					if (abs(x) > thresh || abs(y) > thresh)
 						m_view->TranslateBy(x * move_coef, y * move_coef);
 					if (abs(rx) > thresh || abs(ry) > thresh)
 						m_view->RotateAboutCenter(rx * rot_coef, ry * rot_coef);
 					if (abs(rz) > thresh)
 						m_view->RollBy(-rz * rot_coef);
+					//m_view->put_EnableGraphicsUpdate(true);
 				}
 			}
 		}
