@@ -166,16 +166,17 @@ namespace SpacenavdSw
         private ModelView mw;
         private Thread t1;
 
-        void test()
-        {
-            ModelDoc2 swModel = default(ModelDoc2);
-            ModelViewManager swModelViewManager = default(ModelViewManager);
-            ModelView swModelView = default(ModelView);
-            swModel = (ModelDoc2)m_App.ActiveDoc;
+        private double x;
+        private double y;
+        private double z;
+        private double rx;
+        private double ry;
+        private double rz;
 
-            swModelView = (ModelView)swModel.ActiveView;
-            swModelView.TranslateBy(-0.0005535897435897, 0);
-        }
+        private double move_coef = 0.00004;
+        private double rot_coef = 0.00030;
+        private double tilt_coef = 0.0014;
+        private double zoom_coef = 0.000000005;
 
         void poll_thread()
         {
@@ -196,11 +197,13 @@ namespace SpacenavdSw
                         res_array[i] = num;
                     }
 
-                    for (int i = 0; i < 32 / 4; i++)
-                    {
-                        Debug.WriteLine(res_array[i]);
-                    }
-                    Debug.WriteLine("*****");
+                    x = res_array[1];
+                    y = res_array[2];
+                    z = res_array[3];
+                    rx = res_array[4];
+                    ry = res_array[5];
+                    rz = res_array[6];
+
                     MouseEvent(MouseEventFlags.LeftUp);
                 }
             }
@@ -231,6 +234,7 @@ namespace SpacenavdSw
         {
             if (Message == 4)
             {
+                /*
                 MathTransform trans = mw.Orientation3;
                 MathUtility mu = m_App.GetMathUtility();
 
@@ -248,6 +252,11 @@ namespace SpacenavdSw
 
                 mw.Orientation3 = trans;
                 mw.GraphicsRedraw(null);
+                */
+                /* The below seems to work fine :) */
+                mw.TranslateBy(x * move_coef, y * move_coef);
+                mw.RotateAboutCenter(rx * rot_coef, ry * rot_coef);
+                mw.RollBy(-rz * rot_coef);
             }
             return 0;
         }
