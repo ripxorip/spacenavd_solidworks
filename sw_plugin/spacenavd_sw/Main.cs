@@ -1,4 +1,5 @@
 ﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 using System;
 using System.ComponentModel;
@@ -12,8 +13,8 @@ namespace SpacenavdSw
 {
     [ComVisible(true)]
     [Guid("31B803E0-7A01-4841-A0DE-895B726625C9")]
-    [DisplayName("Spacenavd SW")]
-    [Description("Spacenavd solidworks plugin")]
+    [DisplayName("Spacenavd SW Dotnet")]
+    [Description("Spacenavd dotnet solidworks plugin")]
     public class SpacenavdSw : ISwAddin
     {
         #region Registration
@@ -93,7 +94,76 @@ namespace SpacenavdSw
 
         #endregion
 
-        private ISldWorks m_App;
+        [Flags]
+        public enum MouseEventFlags
+        {
+            LeftDown = 0x00000002,
+            LeftUp = 0x00000004,
+            MiddleDown = 0x00000020,
+            MiddleUp = 0x00000040,
+            Move = 0x00000001,
+            Absolute = 0x00008000,
+            RightDown = 0x00000008,
+            RightUp = 0x00000010
+        }
+
+        [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetCursorPos(int x, int y);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetCursorPos(out MousePoint lpMousePoint);
+
+        [DllImport("user32.dll")]
+        private static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
+
+        public static void SetCursorPosition(int x, int y)
+        {
+            SetCursorPos(x, y);
+        }
+
+        public static void SetCursorPosition(MousePoint point)
+        {
+            SetCursorPos(point.X, point.Y);
+        }
+
+        public static MousePoint GetCursorPosition()
+        {
+            MousePoint currentMousePoint;
+            var gotPoint = GetCursorPos(out currentMousePoint);
+            if (!gotPoint) { currentMousePoint = new MousePoint(0, 0); }
+            return currentMousePoint;
+        }
+
+        public static void MouseEvent(MouseEventFlags value)
+        {
+            MousePoint position = GetCursorPosition();
+
+            mouse_event
+                ((int)value,
+                 position.X,
+                 position.Y,
+                 0,
+                 0)
+                ;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MousePoint
+        {
+            public int X;
+            public int Y;
+
+            public MousePoint(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+        }
+
+        private SldWorks m_App;
+        private ModelView mw;
         private Thread t1;
 
         void test()
@@ -109,7 +179,7 @@ namespace SpacenavdSw
 
         void poll_thread()
         {
-            var server = "10.0.0.230";
+            var server = "192.168.1.52";
             Int32 port = 11111;
             using (TcpClient client = new TcpClient(server, port))
             {
@@ -131,30 +201,60 @@ namespace SpacenavdSw
                         Debug.WriteLine(res_array[i]);
                     }
                     Debug.WriteLine("*****");
-                    ModelDoc2 swModel = default(ModelDoc2);
-                    ModelViewManager swModelViewManager = default(ModelViewManager);
-                    ModelView swModelView = default(ModelView);
-                    swModel = (ModelDoc2)m_App.ActiveDoc;
-                    if (swModel == null)
-                    {
-                        Debug.WriteLine("Oops...\n");
-                    }
-
-                    swModelView = (ModelView)swModel.ActiveView;
-                    swModelView.TranslateBy(20e-6 * res_array[1], 20e-6 * res_array[2]);
+                    MouseEvent(MouseEventFlags.LeftUp);
                 }
             }
         }
 
         public bool ConnectToSW(object ThisSW, int Cookie)
         {
-            m_App = ThisSW as ISldWorks;
+            m_App = ThisSW as SldWorks;
+            m_App.ActiveDocChangeNotify += M_App_ActiveDocChangeNotify;
 
-            Debug.WriteLine("Hello from the spacenavd_sw plugin");
             t1 = new Thread(poll_thread);
             t1.Start();
 
             return true;
+        }
+
+        private int M_App_ActiveDocChangeNotify()
+        {
+            ModelDoc2 doc = m_App.ActiveDoc as ModelDoc2;
+            mw = doc.ActiveView;
+            mw.ViewChangeNotify += Mw_ViewChangeNotify;
+            Mouse deadmouse = mw.GetMouse();
+            deadmouse.MouseNotify += Deadmouse_MouseNotify;
+            return 0;
+        }
+
+        private int Deadmouse_MouseNotify(int Message, int WParam, int LParam)
+        {
+            if (Message == 4)
+            {
+                MathTransform trans = mw.Orientation3;
+                MathUtility mu = m_App.GetMathUtility();
+
+                double[] data = { 0.00, 0.00, 0.00 };
+
+                MathVector x = mu.ICreateVector(ref data[0]);
+                MathVector y = mu.ICreateVector(ref data[0]);
+                MathVector z = mu.ICreateVector(ref data[0]);
+                MathVector transl = mu.ICreateVector(ref data[0]);
+                double scale = 0.00;
+
+                trans.IGetData2(ref x, ref y, ref z, ref transl, ref scale);
+                scale += 0.3;
+                trans.ISetData(x, y, z, transl, scale);
+
+                mw.Orientation3 = trans;
+                mw.GraphicsRedraw(null);
+            }
+            return 0;
+        }
+
+        private int Mw_ViewChangeNotify(object View)
+        {
+            return 0;
         }
 
         public bool DisconnectFromSW()

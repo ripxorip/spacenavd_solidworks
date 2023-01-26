@@ -1,1 +1,1 @@
-C:\windows\Microsoft.NET\Framework64\v4.0.30319\regasm /codebase C:\sw_addins\HelloClassLib.dll
+C:\windows\Microsoft.NET\Framework64\v4.0.30319\regasm /codebase Z:\home\ripxorip\dev\spacenavd_solidworks\sw_plugin\spacenavd_sw\bin\Release\spacenavd_sw.dll

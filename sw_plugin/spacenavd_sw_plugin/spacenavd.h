@@ -102,7 +102,7 @@ public:
 		struct sockaddr_in server;
 		WSAStartup(MAKEWORD(2, 2), &wsa);
 		s = socket(AF_INET, SOCK_STREAM, 0);
-		server.sin_addr.s_addr = inet_addr("10.0.0.230");
+		server.sin_addr.s_addr = inet_addr("192.168.1.52");
 		server.sin_family = AF_INET;
 		server.sin_port = htons(11111);
 		connect(s, (struct sockaddr*)&server, sizeof(server));
