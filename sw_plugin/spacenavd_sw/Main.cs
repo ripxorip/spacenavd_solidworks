@@ -166,6 +166,8 @@ namespace SpacenavdSw
         private ModelView mw;
         private Thread t1;
 
+        private Mouse deadmouse;
+
         private double x;
         private double y;
         private double z;
@@ -225,7 +227,7 @@ namespace SpacenavdSw
             ModelDoc2 doc = m_App.ActiveDoc as ModelDoc2;
             mw = doc.ActiveView;
             mw.ViewChangeNotify += Mw_ViewChangeNotify;
-            Mouse deadmouse = mw.GetMouse();
+            deadmouse = mw.GetMouse();
             deadmouse.MouseNotify += Deadmouse_MouseNotify;
             return 0;
         }
