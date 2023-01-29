@@ -180,7 +180,7 @@ namespace SpacenavdSw
 
         void poll_thread()
         {
-            var server = "192.168.1.52";
+            var server = "10.0.0.230";
             Int32 port = 11111;
             using (TcpClient client = new TcpClient(server, port))
             {

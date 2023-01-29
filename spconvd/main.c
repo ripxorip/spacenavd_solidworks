@@ -165,7 +165,8 @@ int main(void)
 
 				if(fds[i].revents != POLLIN) {
 					DPRN("poll() invalid revents == 0x%04x fds[%d]\n", fds[i].revents, i);
-					continue;
+					run = 0;
+					break;
 				}
 
 				if (fds[i].fd == confd) {
